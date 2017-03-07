@@ -1,0 +1,284 @@
+/***********************************C++ 第一次作业*******************************
+————————————————————————————————————————————————————————————————————————————————
+Description
+Implement a big integer class with overloading some operators (+, -, *, =).
+We have provided the declaration of the class and the main function. Based on these codes, solve the problem.
+—————————————————————————————————————————————————————————————————————————————————
+#include<iostream>
+#include<cstring>
+
+using namespace std;
+class BigInteger
+{
+private:
+int data[500]; 
+int length; 
+public:
+BigInteger(){ length = 1; memset(data,0,sizeof(data)); } 
+BigInteger(const char*);
+BigInteger &operator=(const BigInteger &);
+BigInteger operator+(const BigInteger &) const; 
+BigInteger operator-(const BigInteger &) const; 
+BigInteger operator*(const BigInteger &) const;
+void show(); 
+};
+int main(void)
+{
+int i,n;
+char op;
+char num1[500]={0};
+char num2[500]={0};
+while( cin >> num1 >> op >> num2)
+{
+BigInteger a(num1),b(num2),c;
+switch (op)
+{
+case '+':
+c = a + b;
+break;
+case '-':
+c = a - b;
+break;
+case '*':
+c = a * b;
+break;
+}
+c.show();
+memset(num1,0, sizeof(num1));
+memset(num2,0, sizeof(num2));
+}
+}
+————————————————————————————————————————————————————————————————————————————————————————————
+Input
+There are 2 big integers and an operator in each line. An space is seperated between the operator and the big integer.
+————————————————————————————————————————————————————————————————————————————————————————————
+Output
+For each input line, output the result. There is a "\n" at the end of each line.
+————————————————————————————————————————————————————————————————————————————————————————————
+Sample Input
+12345678 + 87654321
+12345678 - 87654321
+12345678 * 87654321
+452113123 * 0
+99999999999999 + 1111111111111111111111111
+Sample Output
+99999999
+-75308643
+1082152022374638
+0
+1111111111211111111111110
+************************************************************************************************/
+#include <iostream>
+#include <cstring>
+
+using namespace std;
+
+class BigInteger
+{
+    private:
+        int data[500];
+        int length;
+    public:
+        BigInteger(){ length = 1; memset(data,0,sizeof(data)); }
+        BigInteger(const char*);
+        BigInteger &operator=(const BigInteger &);
+        BigInteger operator+(const BigInteger &) const;
+        BigInteger operator-(const BigInteger &) const;
+        BigInteger operator*(const BigInteger &) const;
+        void show();
+};
+
+BigInteger::BigInteger(const char* num)
+{
+    length=0;
+    while (isdigit(*num))
+    {
+        length++;
+        num++;
+    }
+    num--;
+    for (int i=0;i<=length;i++)
+    {
+        data[i]=*num - '0';
+        num--;
+    }
+}
+
+void BigInteger::show()
+{
+    int flag=0;
+    if (data[length-1]==-1)
+    {
+        cout<<'-';
+        flag=1;
+    }
+    int i=length-1-flag;
+    while (data[i]==0 && i>=0) i--;
+    if (i==-1)
+        cout<<'0';
+    while (i>=0)
+    {
+        cout<<data[i];
+        i--;
+    }
+    cout<<endl;
+}
+
+BigInteger & BigInteger:: operator= (const BigInteger & ans)
+{
+    length=ans.length;
+    for (int i=0;i<length;i++)
+    {
+        data[i]=ans.data[i];
+    }
+}
+
+BigInteger  BigInteger::operator+ (const BigInteger & b) const
+{
+    BigInteger ans;
+    int jw=0;
+    if (length>b.length)
+    {
+        for (int i=0;i<length;i++)
+        {
+            if (i<b.length)
+                ans.data[i]=data[i]+jw+b.data[i];
+            else
+                ans.data[i]=data[i]+jw;
+            jw=0;
+            while (ans.data[i]>=10)
+            {
+                ans.data[i]-=10;
+                jw++;
+            }
+        }
+        ans.data[length]=jw;
+        ans.length=length+1;
+    }
+    else
+    {
+        for (int i=0;i<b.length;i++)
+        {
+            if (i<length)
+                ans.data[i]=data[i]+jw+b.data[i];
+            else
+                ans.data[i]=b.data[i]+jw;
+            jw=0;
+            while (ans.data[i]>=10)
+            {
+                ans.data[i]-=10;
+                jw++;
+            }
+        }
+        ans.data[b.length]=jw;
+        ans.length=b.length+1;
+    }
+
+    return ans;
+}
+
+BigInteger  BigInteger::operator- (const BigInteger & b) const
+{
+    BigInteger ans;
+    int flag=1;
+    if (length>b.length)
+        flag=0;
+    if (length==b.length)
+    {
+        for (int i=length-1;i>=0;i--)
+        {
+            if (data[i]>b.data[i])
+            {
+                flag=0;
+                break;
+            }
+            if (data[i]<b.data[i])
+            {
+                flag=1;
+                break;
+            }
+        }
+    }
+    int jw=0;
+    if (flag==0)
+    {
+        for (int i=0;i<length;i++)
+        {
+            if (i<b.length)
+                ans.data[i]=data[i]+jw-b.data[i];
+            else
+                ans.data[i]=data[i]+jw;
+            jw=0;
+            while (ans.data[i]<0)
+            {
+                jw--;
+                ans.data[i]+=10;
+            }
+        }
+        ans.length=length;
+    }
+    else
+    {
+        for (int i=0;i<b.length;i++)
+        {
+            if (i<length)
+                ans.data[i]=b.data[i]+jw-data[i];
+            else
+                ans.data[i]=b.data[i]+jw;
+            jw=0;
+            while (ans.data[i]<0)
+            {
+                jw--;
+                ans.data[i]+=10;
+            }
+        }
+        ans.data[b.length]=-1;
+        ans.length=b.length+1;
+    }
+    return ans;
+}
+
+BigInteger  BigInteger::operator* (const BigInteger & b) const
+{
+    BigInteger ans;
+    for (int i=0;i<b.length;i++)
+    {
+        BigInteger temp;
+        for (int j=i;j<length+i;j++)
+        {
+            temp.data[j]=b.data[i]*data[j-i];
+        }
+        temp.length=length+i;
+        ans=ans+temp;
+    }
+    return ans;
+}
+
+
+int main(void)
+{
+    int i,n;
+    char op;
+    char num1[500]={0};
+    char num2[500]={0};
+    while( cin >> num1 >> op >> num2)
+    {
+        BigInteger a(num1),b(num2),c;
+
+        switch (op)
+        {
+            case '+':
+                c = a + b;
+                break;
+            case '-':
+                c = a - b;
+                break;
+            case '*':
+                c = a * b;
+                break;
+        }
+        c.show();
+        memset(num1,0, sizeof(num1));
+        memset(num2,0, sizeof(num2));
+    }
+}
